@@ -4,12 +4,12 @@
 // GEEF DATUM EN UUR HIERONDER IN, VERGEET DE PUNTKOMMA NIET
 int jaar = 2022;
 int maand = 12;
-int dag = 6;
-int uur = 14;
-int minuut = 14;
+int dag = 20;
+int uur = 11;
+int minuut = 21;
 
 // Bepaalt hoe snel een dag verloopt. Bij een snelheid van 10 zal de dag 10x sneller verlopen. 
-int snelheid = 1; 
+int snelheid = 30000; 
 
 // Coördinaten Gent
 double latitude = 51.053581;

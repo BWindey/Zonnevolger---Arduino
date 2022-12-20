@@ -1,163 +1,149 @@
 #include "RGB_leds.h"
 #include "gebruiker.h"
-#include "suncalc.h"
-
 
 void setup() 
 {
-  // pinMode(LED_1, OUTPUT);       // Red
-  // pinMode(LED_1 + 1, OUTPUT);   // Green
-  // pinMode(LED_1 + 2, OUTPUT);   // Blue
-
-  pinMode(LED_2, OUTPUT);       // Red
-  pinMode(LED_2 + 1, OUTPUT);   // Green
-  pinMode(LED_2 + 2, OUTPUT);   // Blue
-  
-  pinMode(LED_3, OUTPUT);
-
-  // Alle digitale pins voor de transistors
-  pinMode(TRANS_1, OUTPUT);
-  pinMode(TRANS_2, OUTPUT);
-  pinMode(TRANS_3, OUTPUT);
-  pinMode(TRANS_4, OUTPUT);
-  pinMode(TRANS_5, OUTPUT);
-  pinMode(TRANS_6, OUTPUT);
-  pinMode(TRANS_7, OUTPUT);
-
-  digitalWrite(TRANS_1, HIGH);
-  digitalWrite(TRANS_2, HIGH);
-  digitalWrite(TRANS_3, HIGH);
-  digitalWrite(TRANS_4, HIGH);
-  digitalWrite(TRANS_5, HIGH);
-  digitalWrite(TRANS_6, HIGH);
-  digitalWrite(TRANS_7, HIGH);
-
-  prev_time = millis();
-  delay(20);
-  cur_time = millis();
-  get_sun_set_rise();
+  for(int i = 0; i < 10; i++)
+  {
+    pinMode(pinnen[i], OUTPUT);
+    if(i <= 8)
+      digitalWrite(i, HIGH);
+  }
+  vorig = millis();
+  delay(10);
+  huidig = millis();
+  haal_zonsopkomst_ondergang();
 }
 
-
+//type een van de volgende functies en verwijder de bestaande binnen loop():
+// multiplex_voorbeeld();
+// zonne_volger();
+// foto();
+// alternerend_groen_rood_kerstsfeer();
 void loop() 
 {
-  
+  zonne_volger();
 }
 
-
-void RGB_color(int LED, int red_light_value, int green_light_value, int blue_light_value)
+void RGB_kleur(int rood_licht, int groen_licht, int blauw_licht)
 {
-  analogWrite(LED, red_light_value);
-  analogWrite(LED + 1, green_light_value);
-  analogWrite(LED + 2, blue_light_value);
+  analogWrite(LED, rood_licht);
+  analogWrite(LED + 1, groen_licht);
+  analogWrite(LED + 2, blauw_licht);
 }
 
-
-void alternerend_groen_rood_kerstsfeer()
+void multiplex_voorbeeld()
 {
-  int foo = 0;
-  while(true)
+  for(int i = 0; i < 3; i++)
   {
-    if(foo <= 300)
-    {
-      RGB_color(LED_2, 255, 0, 0);
-      digitalWrite(TRANS_1, LOW);
-      delay(1);
-      digitalWrite(TRANS_1, HIGH);
-
-      RGB_color(LED_2, 0, 255, 0);
-      digitalWrite(TRANS_2, LOW);
-      delay(1);
-      digitalWrite(TRANS_2, HIGH);
-
-      RGB_color(LED_2, 255, 0, 0);
-      digitalWrite(TRANS_3, LOW);
-      delay(1);
-      digitalWrite(TRANS_3, HIGH);
-
-      RGB_color(LED_2, 0, 255, 0);
-      digitalWrite(TRANS_4, LOW);
-      delay(1);
-      digitalWrite(TRANS_4, HIGH);
-
-      RGB_color(LED_2, 255, 0, 0);
-      digitalWrite(TRANS_5, LOW);
-      delay(1);
-      digitalWrite(TRANS_5, HIGH);
-
-      RGB_color(LED_2, 0, 255, 0);
-      digitalWrite(TRANS_6, LOW);
-      delay(1);
-      digitalWrite(TRANS_6, HIGH);
-
-      RGB_color(LED_2, 255, 0, 0);
-      digitalWrite(TRANS_7, LOW);
-      delay(1);
-      digitalWrite(TRANS_7, HIGH);
-    }
-
-    else
-    {
-      RGB_color(LED_2, 0, 255, 0);
-      digitalWrite(TRANS_1, LOW);
-      delay(1);
-      digitalWrite(TRANS_1, HIGH);
-
-      RGB_color(LED_2, 255, 0, 0);
-      digitalWrite(TRANS_2, LOW);
-      delay(1);
-      digitalWrite(TRANS_2, HIGH);
-
-      RGB_color(LED_2, 0, 255, 0);
-      digitalWrite(TRANS_3, LOW);
-      delay(1);
-      digitalWrite(TRANS_3, HIGH);
-
-      RGB_color(LED_2, 255, 0, 0);
-      digitalWrite(TRANS_4, LOW);
-      delay(1);
-      digitalWrite(TRANS_4, HIGH);
-
-      RGB_color(LED_2, 0, 255, 0);
-      digitalWrite(TRANS_5, LOW);
-      delay(1);
-      digitalWrite(TRANS_5, HIGH);
-
-      RGB_color(LED_2, 255, 0, 0);
-      digitalWrite(TRANS_6, LOW);
-      delay(1);
-      digitalWrite(TRANS_6, HIGH);
-
-      RGB_color(LED_2, 0, 255, 0);
-      digitalWrite(TRANS_7, LOW);
-      delay(1);
-      digitalWrite(TRANS_7, HIGH);
-    }
-    foo++;
-    if(foo >= 600)
-      foo = 0;
+    hulp_multiplex_voorbeeld(100);
+  }
+  for(int i = 0; i < 15; i++)
+  {
+    hulp_multiplex_voorbeeld(20);
+  }
+  for(int i = 0; i < 1500; i++)
+  {
+    hulp_multiplex_voorbeeld(1);
   }
 }
 
-
-void update_time()
+void hulp_multiplex_voorbeeld(int pause)
 {
-  cur_time = millis();
-  if(cur_time - prev_time >= 3600000/snelheid)
+  int kleur[3] = {255, 0, 0};
+  for(int i = 0; i < 7; i++)
   {
-    prev_time = cur_time;
+    RGB_kleur(kleur[0], kleur[1], kleur[2]);
+    digitalWrite(i + 2, LOW);
+    delay(pause);
+    digitalWrite(i + 2, HIGH);
+
+    int temp = kleur[0];
+    kleur[0] = kleur[1];
+    kleur[1] = kleur[2];
+    kleur[2] = temp;
+  }
+}
+
+void foto()
+{
+  int kleur[3] = {255, 0, 0};
+  for(int i = 0; i < 7; i++)
+  {
+    if(i % 2 == 1)
+    {
+      RGB_kleur(kleur[0], kleur[1], kleur[2]);
+      digitalWrite(i + 2, LOW);
+      // Schuif de waarden van kleur op
+      int temp = kleur[2];
+      kleur[2] = kleur[1];
+      kleur[1] = kleur[0];
+      kleur[0] = temp;
+      delay(1);
+      digitalWrite(i+2, HIGH);
+    }
+    else
+      digitalWrite(i+2, HIGH);
+  }
+}
+
+void alternerend_groen_rood_kerstsfeer()
+{
+  huidig = millis();
+  int speed = 500;
+  if(huidig - vorig >= speed)
+  {
+    int kleur[2] = {0, 255};
+    for(int i = 0; i < 7; i++)
+    {
+      RGB_kleur(kleur[0], kleur[1], 0);
+      digitalWrite(i + 2, LOW);
+      delay(1);
+      digitalWrite(i + 2, HIGH);
+
+      int temp = kleur[0];
+      kleur[0] = kleur[1];
+      kleur[1] = temp;
+    }
+  }
+  else
+  {
+    int kleur[2] = {255, 0};
+    for(int i = 0; i < 7; i++)
+    {
+      RGB_kleur(kleur[0], kleur[1], 0);
+      digitalWrite(i + 2, LOW);
+      delay(1);
+      digitalWrite(i + 2, HIGH);
+
+      int temp = kleur[0];
+      kleur[0] = kleur[1];
+      kleur[1] = temp;
+    }
+  }
+  if(huidig - vorig >= 2 * speed)
+    vorig = huidig;
+}
+
+void update_tijd()
+{
+  huidig = millis();
+  if((huidig - vorig) * snelheid >= 3600000)
+  {
+    vorig = huidig;
     minuut++;
 
     if(minuut >= 60)
     {
       uur++;
+      // Serial.println(uur);
       minuut -= 60;
 
       if(uur >= 24)
       {
         dag++;
         uur -= 24;
-        get_sun_set_rise();
+        haal_zonsopkomst_ondergang();
 
         if(maand == 2)
         {
@@ -193,7 +179,6 @@ void update_time()
   }  
 }
 
-
 bool is_schrikkeljaar()
 {
   if(jaar % 4 != 0) {return false; }
@@ -202,22 +187,9 @@ bool is_schrikkeljaar()
   return true;
 }
 
-
-void get_sun_set_rise()
+void haal_zonsopkomst_ondergang()
 {
   get_rise_set_dawn_dusk(latitude, longitude, jaar, maand, dag, &kleurhemel);
-}
-
-
-
-bool nacht()
-{
-  if((kleurhemel[6] < uur && kleurhemel[7] < minuut) || (kleurhemel[0] > uur && kleurhemel[1] > minuut))
-  {
-    return true;
-  }
-
-  return false;
 }
 
 bool in_interval(int a, int b, int c)
@@ -230,20 +202,57 @@ bool in_interval(double a, double b, double c)
   return (c >= a) && (c <= b);
 }
 
-
-void update_leds()
+int deel_van_dag(int intervallen[7][2])
 {
-  update_time();
+  int tijd = uur * 60 + minuut;
+
+  for(int i = 0; i < 7; i++)
+  {
+    if(tijd > intervallen[i][0] && tijd < intervallen[i][1])
+      return i;
+  }
+  return 10;
+}
+
+void zonne_volger()
+{
+  update_tijd();
   // daglengte in minuten
-  daglengte = kleurhemel[6] * 60 + kleurhemel[7] - (kleurhemel[0] * 60 + kleurhemel[1]);
+  int daglengte = kleurhemel[6] * 60 + kleurhemel[7] - (kleurhemel[0] * 60 + kleurhemel[1]);
   int interval_lengte = int(daglengte / 7);
-   
+  int zonsopkomst = kleurhemel[0] * 60 + kleurhemel[1];
   int intervallen[7][2];
+
   for(int i = 0; i < 7; i++)
   {
     // De nacht kan tot 6m te vroeg invallen doordat we enkel met gehele getallen werken.
-    intervallen[i][0] = interval_lengte * i;
-    intervallen[i][1] = interval_lengte * (i + 1);
+    intervallen[i][0] = zonsopkomst + interval_lengte * i;
+    intervallen[i][1] = zonsopkomst + interval_lengte * (i + 1);
+  }
+
+  int deel_dag = deel_van_dag(intervallen);
+  if(deel_dag == 10)
+  {
+    RGB_kleur(0, 0, 0);
+    return;
+  }
+
+  for(int i = 0; i < 7; i++)
+  {
+    if(i == deel_dag)
+    {
+      RGB_kleur(255, 255, 0);
+      digitalWrite(i + TRANS_1, LOW);
+      delay(1);
+      digitalWrite(i + TRANS_1, HIGH);
+    }
+    else
+    {
+      RGB_kleur(0, 0, 255);
+      digitalWrite(i + TRANS_1, LOW);
+      delay(1);
+      digitalWrite(i + TRANS_1, HIGH);
+    }
   }
 }
 
